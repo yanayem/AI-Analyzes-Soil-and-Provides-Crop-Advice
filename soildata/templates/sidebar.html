@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soil Monitor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="transition-colors duration-500 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+
+<!-- Top Bar -->
+<header class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-2xl z-50 transition-all">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+
+      <!-- Left: Logo + Mobile Menu -->
+      <div class="flex items-center space-x-2">
+        <button id="mobileMenuBtn" class="md:hidden px-4 transition transform hover:-translate-y-0.5">
+          <i class="fas fa-bars text-gray-900 dark:text-white text-lg"></i>
+        </button>
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-12 w-12 rounded-full shadow-lg">
+        <span class="inline text-2xl font-bold text-blue-600 dark:text-blue-400">Soil Monitor</span>
+      </div>
+
+      <!-- Right: Theme Toggle + User Info (hidden on small screens) -->
+      <div class="flex items-center space-x-4">
+
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="p-2 transition transform hover:-translate-y-0.5">
+          <i id="themeIcon" class="fas fa-sun text-yellow-400 text-lg"></i>
+        </button>
+
+        <!-- User Profile -->
+        <div class="flex items-center space-x-2 bg-white dark:bg-gray-700 rounded-full shadow-md px-2 py-1 hover:shadow-xl transition transform hover:-translate-y-0.5 cursor-pointer">
+          <img src="{{ profile.profile_pic.url }}" alt="Profile Pic" class="h-10 w-10 rounded-full object-cover border-2 border-blue-500 shadow-md">
+          <span class="font-medium text-gray-900 dark:text-gray-100">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside id="sidebarMenu" class="fixed top-16 left-0 w-64 h-full bg-gray-100 dark:bg-[#27374d] text-gray-900 dark:text-white shadow-2xl z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto">
+  <ul class="flex flex-col mt-4 space-y-1">
+
+    <li class="rounded-lg">
+      <a href="{% url 'soildata:dashboard'%}" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+        <i class="fa fa-tachometer text-blue-500 dark:text-blue-300"></i> Dashboard
+      </a>
+    </li>
+
+    <li class="rounded-lg">
+      <a href="" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+        <i class="fa fa-leaf text-green-500 dark:text-green-400"></i> Crop Health
+      </a>
+    </li>
+
+    <li class="rounded-lg">
+      <a href="" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+        <i class="fa fa-users text-yellow-500 dark:text-yellow-400"></i> Community
+      </a>
+    </li>
+
+    <li class="rounded-lg">
+      <a href="" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+        <i class="fa fa-leaf text-green-500 dark:text-green-400"></i> Crop Advisor
+      </a>
+    </li>
+
+    <li class="rounded-lg">
+      <a href="" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+        <i class="fa fa-comments text-pink-500 dark:text-pink-400"></i> ChatBot
+      </a>
+    </li>
+
+    <li class="rounded-lg">
+      <a href="" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+        <i class="fa fa-cog text-gray-600 dark:text-gray-300"></i> Settings
+      </a>
+    </li>
+
+    <li class="rounded-lg">
+      <a href="" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+        <i class="fa fa-user text-gray-600 dark:text-gray-300"></i> Profile
+      </a>
+    </li>
+
+    <li>
+      <a href="{% url 'account:logout' %}" class="flex items-center gap-3 px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1 bg-red-500 hover:bg-red-600">
+        <i class="fa fa-sign-out text-white"></i> Logout
+      </a>
+    </li>
+
+  </ul>
+</aside>
+
+<!-- Scripts -->
+<script>
+  // Theme toggle
+  const html = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+
+  function updateThemeIcon() {
+    if(html.classList.contains('dark')) {
+      themeIcon.classList.replace('fa-sun','fa-moon');
+    } else {
+      themeIcon.classList.replace('fa-moon','fa-sun');
+    }
+  }
+  updateThemeIcon();
+
+  themeToggle.addEventListener('click', () => {
+    html.classList.toggle('dark');
+    updateThemeIcon();
+  });
+
+  // Mobile sidebar toggle
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  const sidebar = document.getElementById('sidebarMenu');
+
+  mobileBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+</script>
+
+</body>
+</html>

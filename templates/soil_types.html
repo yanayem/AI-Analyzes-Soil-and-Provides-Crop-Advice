@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soil Types</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            lightbg: "#ffffff",
+            darkbg: "#000000",
+            lighttext: "#000000",
+            darktext: "#ffffff",
+            card: "#f9f9f9",
+            darkcard: "#111111",
+            border: "#ccc",
+            darkborder: "#333",
+            btn: "#000000",
+            darkbtn: "#ffffff"
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-lightbg dark:bg-darkbg/90 text-lighttext dark:text-darktext transition-colors duration-500 min-h-screen">
+ {%include "nav.html" %}
+  <section class="text-center py-10">
+    <h1 class="text-4xl font-bold">Soil Types in Bangladesh</h1>
+  </section>
+
+  <!-- Search & Filter -->
+  <div class="max-w-5xl mx-auto px-4 mb-6">
+    <div class="p-5 rounded-xl shadow border border-border dark:border-darkborder bg-card dark:bg-darkcard">
+      <input id="searchInput" type="text" placeholder="🔍 Search Soil Type..."
+        class="w-full px-4 py-2 mb-3 rounded-lg bg-lightbg dark:bg-darkbg text-lighttext dark:text-darktext outline-none border border-border dark:border-darkborder" />
+
+      <div class="flex gap-3">
+        <input id="phMin" type="number" step="0.1" placeholder="Min pH"
+          class="px-3 py-2 rounded border border-border dark:border-darkborder bg-lightbg dark:bg-darkbg text-lighttext dark:text-darktext w-32" />
+
+        <input id="phMax" type="number" step="0.1" placeholder="Max pH"
+          class="px-3 py-2 rounded border border-border dark:border-darkborder bg-lightbg dark:bg-darkbg text-lighttext dark:text-darktext w-32" />
+
+        <button id="phFilterBtn"
+          class="px-5 py-2 bg-lightbg dark:bg-darkbg border border-border dark:border-darkborder text-lighttext dark:text-darktext rounded-lg">Filter</button>
+
+        <button id="phResetBtn"
+          class="px-5 py-2 bg-lightbg dark:bg-darkbg border border-border dark:border-darkborder text-lighttext dark:text-darktext rounded-lg">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="overflow-x-auto p-5 rounded-xl shadow border border-border dark:border-darkborder bg-card dark:bg-darkcard">
+      <table id="soilTable" class="w-full text-left border-collapse">
+        <thead class="bg-lightbg dark:bg-darkbg border-b border-border dark:border-darkborder text-lighttext dark:text-darktext">
+          <tr>
+            <th class="p-3">Name</th>
+            <th class="p-3">Description</th>
+            <th class="p-3 text-center">pH Range</th>
+            <th class="p-3">Crops</th>
+            <th class="p-3">Location</th>
+            <th class="p-3 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="demoBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const demoSoilData = [
+      {id:1,name:"Alluvial Soil",description:"Rich soil near rivers",ph_min:6.0,ph_max:7.5,suitable_crops:"Rice, Wheat",location:"North"},
+      {id:2,name:"Saline Soil",description:"High salt content soil",ph_min:7.0,ph_max:8.5,suitable_crops:"Barley, Sunflower",location:"Coastal"},
+      {id:3,name:"Clay Soil",description:"Heavy and sticky soil",ph_min:6.5,ph_max:7.8,suitable_crops:"Vegetables",location:"Central"},
+      {id:4,name:"Sandy Soil",description:"Light and drains fast",ph_min:5.5,ph_max:7.0,suitable_crops:"Carrot, Radish",location:"South"},
+    ];
+
+    const tbody = document.getElementById("demoBody");
+    function renderTable(data){
+      tbody.innerHTML = "";
+      data.forEach(soil=>{
+        const tr = document.createElement("tr");
+        tr.dataset.id = soil.id;
+        tr.className = "border-b border-border dark:border-darkborder hover:bg-gray-200 dark:hover:bg-gray-700 transition-all";
+        tr.innerHTML = `
+          <td class="p-3">${soil.name}</td>
+          <td class="p-3">${soil.description}</td>
+          <td class="p-3 text-center">${soil.ph_min} - ${soil.ph_max}</td>
+          <td class="p-3">${soil.suitable_crops}</td>
+          <td class="p-3">${soil.location}</td>
+          <td class="p-3 text-center flex justify-center gap-2">
+            <button class="editBtn px-2 py-1 border border-border dark:border-darkborder rounded">Edit</button>
+            <button class="saveBtn px-2 py-1 border border-border dark:border-darkborder rounded hidden">Save</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    renderTable(demoSoilData);
+
+    // Search
+    document.getElementById("searchInput").addEventListener("keyup", function(){
+      const val = this.value.toLowerCase();
+      Array.from(tbody.rows).forEach(row=>{
+        row.style.display = row.cells[0].innerText.toLowerCase().includes(val) ? "" : "none";
+      });
+    });
+
+    // pH filter
+    document.getElementById("phFilterBtn").addEventListener("click", ()=>{
+      const min = parseFloat(document.getElementById("phMin").value) || -Infinity;
+      const max = parseFloat(document.getElementById("phMax").value) || Infinity;
+      Array.from(tbody.rows).forEach(row=>{
+        const phRange = row.cells[2].innerText.split("-").map(x=>parseFloat(x.trim()));
+        row.style.display = phRange[0]>=min && phRange[1]<=max ? "" : "none";
+      });
+    });
+
+    // Reset
+    document.getElementById("phResetBtn").addEventListener("click", ()=>{
+      document.getElementById("phMin").value="";
+      document.getElementById("phMax").value="";
+      document.getElementById("searchInput").value="";
+      Array.from(tbody.rows).forEach(row=>row.style.display="");
+    });
+
+    tbody.addEventListener("click", function(e){
+      const tr = e.target.closest("tr");
+      if(e.target.classList.contains("editBtn")){
+        Array.from(tr.cells).forEach((cell,i)=>{
+          if(i<5){
+            const text = cell.innerText;
+            cell.innerHTML = `<input type='text' value='${text}' class='w-full px-1 py-1 bg-lightbg dark:bg-darkbg text-lighttext dark:text-darktext border border-border dark:border-darkborder rounded'/>`;
+          }
+        });
+        tr.querySelector(".editBtn").classList.add("hidden");
+        tr.querySelector(".saveBtn").classList.remove("hidden");
+      }
+      else if(e.target.classList.contains("saveBtn")){
+        Array.from(tr.cells).forEach((cell,i)=>{
+          if(i<5){
+            const val = cell.querySelector("input").value;
+            cell.innerText = val;
+          }
+        });
+        tr.querySelector(".saveBtn").classList.add("hidden");
+        tr.querySelector(".editBtn").classList.remove("hidden");
+      }
+    });
+  </script>
+
+</body>
+</html>

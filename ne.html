@@ -1,0 +1,361 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login & Signup</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: "class" };
+    </script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      body {
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+      }
+
+      .card {
+        background-size: cover;
+        background-position: center;
+      }
+
+      .card-3d-wrapper {
+        perspective: 1000px;
+      }
+      .card {
+        backface-visibility: hidden;
+        transition: transform 0.8s ease;
+      }
+      .card-3d-wrapper.flipped .front {
+        transform: rotateY(-180deg);
+      }
+      .card-3d-wrapper.flipped .back {
+        transform: rotateY(0deg);
+      }
+      .back {
+        transform: rotateY(180deg);
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-[#041c32] via-[#04293a] to-[#064663] items-center"
+  >
+    {% include "nav.html" %}
+
+    <section class="w-full flex justify-center px-4">
+      <div
+        class="card-3d-wrapper relative w-full max-w-md mt-10"
+        id="card-wrapper"
+      >
+        <!-- LOGIN CARD -->
+        <div
+  class="card front absolute w-full h-auto bg-[#113f67]/80 
+  text-white shadow-2xl rounded-2xl p-8 border border-white/20 backdrop-blur-lg"
+>
+
+
+
+          <h1 class="text-center text-2xl mb-5 font-semibold">Welcome Back</h1>
+
+          <form method="post" action="{% url 'account:login' %}">
+            {% csrf_token %}
+
+            <!-- Email -->
+            <div
+              class="flex items-center bg-white/10 border border-white/20 rounded-lg mb-4 px-3"
+            >
+              <i class="fa fa-envelope text-gray-300 pr-2"></i>
+              <input
+                type="email"
+                name="username"
+                placeholder="Email Address"
+                required
+                class="bg-transparent w-full py-3 outline-none text-white placeholder-gray-300"
+              />
+            </div>
+
+            <!-- Password -->
+            <div class="relative mb-4">
+              <div
+                class="flex items-center bg-white/10 border border-white/20 rounded-lg px-3"
+              >
+                <i class="fa fa-lock text-gray-300 pr-2"></i>
+                <input
+                  type="password"
+                  id="loginPassword"
+                  name="password"
+                  placeholder="Password"
+                  required
+                  class="bg-transparent w-full py-3 outline-none text-white placeholder-gray-300"
+                />
+              </div>
+
+              <span
+                onclick="togglePassword('loginPassword', this)"
+                class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-300 hover:text-yellow-400"
+              >
+                <i class="fa fa-eye"></i>
+              </span>
+            </div>
+
+            <!-- Remember me -->
+            <label class="flex items-center gap-2 text-gray-300 text-sm mb-3">
+              <input type="checkbox" class="accent-green-400" />
+              Remember me
+            </label>
+
+            <p class="text-right text-green-300 text-sm mb-4">
+              <a href="#" class="hover:text-white">Forgot Password?</a>
+            </p>
+
+            <button
+              class="w-full py-3 rounded-lg bg-gradient-to-r from-green-300 to-cyan-400 text-gray-900 font-semibold hover:scale-[1.03] transition"
+            >
+              Log In
+            </button>
+
+            <!-- Switch -->
+            <p class="text-center mt-4 text-gray-200">
+              Don’t have an account?
+              <a href="#" id="toSignup" class="text-green-300 font-semibold"
+                >Sign Up</a
+              >
+            </p>
+
+            <!-- Divider -->
+            <div class="relative my-6 text-center text-gray-300 text-sm">
+              <span class="px-2">Or Log in with</span>
+              <div
+                class="absolute left-0 top-1/2 -translate-y-1/2 w-1/3 h-px bg-white/30"
+              ></div>
+              <div
+                class="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 h-px bg-white/30"
+              ></div>
+            </div>
+
+            <!-- Social -->
+            <div class="flex justify-center gap-4">
+              <button
+                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center hover:scale-110 transition"
+              >
+                <i class="fab fa-google"></i>
+              </button>
+              <button
+                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center hover:scale-110 transition"
+              >
+                <i class="fab fa-facebook-f"></i>
+              </button>
+              <button
+                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center hover:scale-110 transition"
+              >
+                <i class="fab fa-pinterest-p"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- SIGNUP CARD -->
+        <div
+          class="card back absolute h-auto w-full bg-[#113f67]/80 text-white shadow-2xl rounded-2xl p-8 border border-white/20 backdrop-blur-lg"
+        >
+          <h1 class="text-center text-2xl mb-5 font-semibold">
+            Create Account
+          </h1>
+
+          <form method="post" action="{% url 'account:login' %}?mode=signup">
+            {% csrf_token %}
+
+            <!-- Name -->
+            <div
+              class="flex items-center bg-white/10 border border-white/20 rounded-lg mb-4 px-3"
+            >
+              <i class="fa fa-user text-gray-300 pr-2"></i>
+              <input
+                type="text"
+                name="full_name"
+                placeholder="Full Name"
+                required
+                class="bg-transparent w-full py-3 outline-none text-white placeholder-gray-300"
+              />
+            </div>
+
+            <!-- Email -->
+            <div
+              class="flex items-center bg-white/10 border border-white/20 rounded-lg mb-4 px-3"
+            >
+              <i class="fa fa-envelope text-gray-300 pr-2"></i>
+              <input
+                type="email"
+                name="email"
+                id="signupEmail"
+                placeholder="Email Address"
+                required
+                class="bg-transparent w-full py-3 outline-none text-white placeholder-gray-300"
+              />
+            </div>
+
+            <!-- Password -->
+            <div class="relative mb-4">
+              <div
+                class="flex items-center bg-white/10 border border-white/20 rounded-lg px-3"
+              >
+                <i class="fa fa-lock text-gray-300 pr-2"></i>
+                <input
+                  type="password"
+                  id="signupPassword"
+                  name="password1"
+                  placeholder="Create Password"
+                  required
+                  class="bg-transparent w-full py-3 outline-none text-white placeholder-gray-300"
+                />
+              </div>
+              <span
+                onclick="togglePassword('signupPassword', this)"
+                class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-300 hover:text-yellow-400"
+                ><i class="fa fa-eye"></i
+              ></span>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="relative mb-4">
+              <div
+                class="flex items-center bg-white/10 border border-white/20 rounded-lg px-3"
+              >
+                <i class="fa fa-lock text-gray-300 pr-2"></i>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="password2"
+                  placeholder="Confirm Password"
+                  required
+                  class="bg-transparent w-full py-3 outline-none text-white placeholder-gray-300"
+                />
+              </div>
+
+              <span
+                onclick="togglePassword('confirmPassword', this)"
+                class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-300 hover:text-yellow-400"
+                ><i class="fa fa-eye"></i
+              ></span>
+            </div>
+
+            <!-- Location -->
+            <div
+              class="flex items-center bg-white/10 border border-white/20 rounded-lg mb-4 px-3"
+            >
+              <i class="fa fa-map-marker-alt text-gray-300 pr-2"></i>
+              <input
+                type="text"
+                name="location"
+                placeholder="Location"
+                required
+                class="bg-transparent w-full py-3 outline-none text-white placeholder-gray-300"
+              />
+            </div>
+
+            <!-- Terms -->
+            <label class="flex items-center gap-2 text-gray-300 text-sm mb-4">
+              <input type="checkbox" required class="accent-green-400" />
+              I agree to the
+              <a
+                href="{% url 'account:terms_privacy' %}"
+                class="text-green-300"
+                target="_blank"
+                >Terms & Privacy Policy</a
+              >
+            </label>
+
+            <button
+              class="w-full py-3 mt-1 rounded-lg bg-gradient-to-r from-green-300 to-cyan-400 text-gray-900 font-semibold hover:scale-[1.03] transition"
+            >
+              Sign Up
+            </button>
+
+            <!-- Switch -->
+            <p class="text-center mt-4 text-gray-200">
+              Already have an account?
+              <a href="#" id="toLogin" class="text-green-300 font-semibold"
+                >Log In</a
+              >
+            </p>
+
+            <!-- Divider -->
+            <div class="relative my-6 text-center text-gray-300 text-sm">
+              <span class="px-2">Or sign up with</span>
+              <div
+                class="absolute left-0 top-1/2 -translate-y-1/2 w-1/3 h-px bg-white/30"
+              ></div>
+              <div
+                class="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 h-px bg-white/30"
+              ></div>
+            </div>
+
+            <!-- Social Row -->
+            <div class="flex justify-center gap-4">
+              <button
+                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center hover:scale-110 transition"
+              >
+                <i class="fab fa-google"></i>
+              </button>
+              <button
+                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center hover:scale-110 transition"
+              >
+                <i class="fab fa-facebook-f"></i>
+              </button>
+              <button
+                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center hover:scale-110 transition"
+              >
+                <i class="fab fa-pinterest-p"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const card = document.getElementById("card-wrapper");
+
+      // Detect mode from Django or URL
+      const djangoMode = "{{ mode|default:'' }}";
+      const params = new URLSearchParams(window.location.search);
+      const urlMode = params.get("mode");
+      const mode = djangoMode || urlMode || "login";
+
+      if (mode === "signup") card.classList.add("flipped");
+
+      // Switch buttons
+      document.getElementById("toSignup")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        card.classList.add("flipped");
+      });
+
+      document.getElementById("toLogin")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        card.classList.remove("flipped");
+      });
+
+      function togglePassword(id, el) {
+        const input = document.getElementById(id);
+        if (input.type === "password") {
+          input.type = "text";
+          el.innerHTML = '<i class="fa fa-eye-slash"></i>';
+        } else {
+          input.type = "password";
+          el.innerHTML = '<i class="fa fa-eye"></i>';
+        }
+      }
+    </script>
+  </body>
+</html>
