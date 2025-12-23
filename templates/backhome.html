@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salinity Sentinel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0077b6',
+            secondary: '#555',
+            accent: '#00ffc3',
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-gray-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 transition-colors duration-500">
+
+  <!-- Navbar -->
+  <nav class="w-full fixed top-0 z-50 bg-gray-200 dark:bg-slate-900/90 shadow-sm transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <img src="{% static 'media/logo.png' %}" alt="logo" class="w-10 h-10 object-cover">
+        <span class="font-bold text-xl text-slate-900 dark:text-slate-100">
+          Salinity <span class="text-accent">Sentinel</span>
+        </span>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 items-center">
+        <a href="{% url 'weather_dashboard' %}" class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/80 transition">← Back to Home</a>
+        <button id="themeToggle" class="px-3 py-2 rounded bg-gray-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100 transition text-xl">
+          🌙
+        </button>
+      </div>
+    </div>
+  </nav>
+
+<script>
+  const html = document.documentElement;
+  const themeBtn = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    if(theme === 'dark') {
+      html.classList.add('dark');
+      themeBtn.textContent = '🌙';
+    } else {
+      html.classList.remove('dark');
+      themeBtn.textContent = '🌞';
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  setTheme(savedTheme);
+
+  themeBtn.addEventListener('click', () => {
+    setTheme(html.classList.contains('dark') ? 'light' : 'dark');
+  });
+
+  // Navbar shadow on scroll
+  const navbar = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 10) navbar.classList.add('shadow-lg');
+    else navbar.classList.remove('shadow-lg');
+  });
+
+  // Animate nav links underline
+  document.querySelectorAll('.nav-link').forEach(link => {
+    const isActive = link.pathname === window.location.pathname;
+    if(isActive) link.classList.add('after:w-full');
+    link.addEventListener('mouseenter', () => link.classList.add('after:w-full'));
+    link.addEventListener('mouseleave', () => { if(!isActive) link.classList.remove('after:w-full'); });
+  });
+</script>
+
+</body>
+</html>

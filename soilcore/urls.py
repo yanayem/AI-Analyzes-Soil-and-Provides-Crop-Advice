@@ -6,16 +6,17 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.homepage, name='homepage'),
     path('about/', views.aboutpage, name='aboutpage'),
     path('soil-types/', views.soil_type_page, name='soil_types'),
     path('soil-types/add/', views.add_soil_type, name='add_soil_type'),
     path('soil-types/edit/<int:id>/', views.edit_soil_type, name='edit_soil_type'),
     path('soil-types/delete/<int:id>/', views.delete_soil_type, name='delete_soil_type'),
     path('terms-privacy/', views.terms_privacy, name='terms_privacy'),
-    path('weather/', include('weather.urls')),
+    path('', include('weather.urls')),
     path('account/', include('account.urls', namespace='account')),
     path('soildata/', include('soildata.urls', namespace='soildata')),
+        # Chat
+    path('chat/', include('chatApp.urls')),
 
 ]
 

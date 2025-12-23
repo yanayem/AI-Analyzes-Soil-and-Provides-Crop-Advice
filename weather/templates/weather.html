@@ -1,126 +1,166 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather App</title>
+  <title>AI Weather Dashboard</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: relative;
-      min-height: 100vh;
-      overflow: hidden;
-    }
+    body { font-family: 'Poppins', sans-serif; transition: background-color 0.5s, color 0.5s; }
 
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background-color: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(6px);
-      z-index: 1;
+    /* Rain effect */
+    #rain-container {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      pointer-events: none; z-index:10;
     }
-
     .rain {
-      position: absolute;
-      width: 2px;
-      height: 20px;
-      background: rgba(255, 255, 255, 0.5);
-      animation: fall linear infinite;
-      top: -20px;
+      position: absolute; top:-20px; width:2px; height:20px;
+      background: rgba(255,255,255,0.6); animation: fall linear infinite;
     }
+    @keyframes fall { to { transform: translateY(110vh); } }
 
-    @keyframes fall {
-      0% { transform: translateY(-50px); }
-      100% { transform: translateY(110vh); }
+    /* Frosty effect overlay */
+    #gas-container {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      pointer-events: none; z-index:5;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(200,255,255,0.1), rgba(255,255,255,0.1));
+      mix-blend-mode: lighten; animation: gasMove 20s linear infinite;
+    }
+    @keyframes gasMove {
+      0% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(50px,50px) scale(1.05); }
+      100% { transform: translate(0,0) scale(1); }
     }
   </style>
 </head>
+<body class="bg-green-100 dark:bg-gray-900 min-h-screen relative transition-colors duration-500 ">
 
-<body
-  {% if exception_occurred %}
-    style="background-image: url('https://images.pexels.com/photos/3008509/pexels-photo-3008509.jpeg?auto=compress&cs=tinysrgb&w=1600');"
-  {% else %}
-    style="background-image: url('{{ image_url }}');"
-  {% endif %}
->
-  <div class="overlay"></div>
+  <!-- Navbar (global) -->
+  {% include "nav.html" %}
 
-  {% for i in rain_drops %}
-    <div class="rain" style="left:{{ i }}%; animation-duration: {{ 0.5|add:i|floatformat:1 }}s;"></div>
-  {% endfor %}
 
-  <div class="relative z-10 flex items-center justify-center p-4 min-h-screen">
-    <div class="bg-white/80 rounded-2xl shadow-xl max-w-3xl w-full p-6 space-y-6 backdrop-blur-md">
-
-      <h1 class="text-3xl font-bold text-center text-blue-600">Weather App</h1>
-      <form method="POST" class="flex flex-col md:flex-row gap-4">
-        {% csrf_token %}
-        <input type="text" name="city" placeholder="Enter City"
-               class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100 text-gray-900 placeholder-gray-400">
-        <button type="submit"
-                class="px-6 py-3 rounded-xl bg-blue-500 text-white font-semibold hover:bg-blue-600 transition">
-          Search
-        </button>
-      </form>
-
-      <div class="flex flex-col md:flex-row items-center justify-between bg-white/70 p-6 rounded-2xl shadow-lg space-y-4 md:space-y-0">
-
-        <div class="text-center md:text-left">
-          <h2 class="text-5xl font-bold text-blue-600">{{ temp }}&#176;C</h2>
-          <h2 class="text-2xl mt-2 text-gray-800">{{ city }}</h2>
-        </div>
-
-        <div class="flex flex-col items-center md:items-end space-y-2">
-          <div class="icon">
-            <img src="http://openweathermap.org/img/w/{{ icon }}.png" alt="weather icon" class="w-28 h-28">
-          </div>
-          <div class="condition text-center md:text-right text-gray-700">
-            <p class="text-lg font-medium capitalize">{{ description }}</p>
-            <p class="text-sm">{{ day }}</p>
-          </div>
-        </div>
-
+  <!-- ================= 1️⃣ INTRO ================= -->
+  <section class="max-w-6xl mx-auto px-6 py-20">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-10 border transition-colors duration-500">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-green-700 dark:text-green-300 mb-6">
+        AI Analyzes Soil & Provides Crop Advice
+      </h1>
+      <p class="text-lg text-gray-700 dark:text-gray-200 leading-relaxed max-w-4xl">
+        Our AI-powered system integrates real-time weather insights and environmental analysis to support smarter agricultural decision-making.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-4">
+        <span class="px-5 py-2 bg-green-200 text-green-800 dark:bg-green-600 dark:text-white rounded-full font-semibold">AI Analysis</span>
+        <span class="px-5 py-2 bg-blue-200 text-blue-800 dark:bg-blue-600 dark:text-white rounded-full font-semibold">Weather Forecast</span>
+        <span class="px-5 py-2 bg-yellow-200 text-yellow-800 dark:bg-yellow-600 dark:text-white rounded-full font-semibold">Smart Crop Advice</span>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-blue-100 rounded-xl p-4 shadow flex flex-col items-center">
-          <h3 class="font-semibold text-lg">Temperature</h3>
-          <p class="text-2xl font-bold">{{ temp }}&#176;C</p>
-        </div>
-        <div class="bg-green-100 rounded-xl p-4 shadow flex flex-col items-center">
-          <h3 class="font-semibold text-lg">Humidity</h3>
-          <p class="text-2xl font-bold">{{ humidity }}%</p>
-        </div>
-        <div class="bg-yellow-100 rounded-xl p-4 shadow flex flex-col items-center">
-          <h3 class="font-semibold text-lg">Rainfall</h3>
-          <p class="text-2xl font-bold">{{ rain }} mm</p>
-        </div>
-      </div>
-
-      <div class="text-center">
-        <a href="{% url 'homepage' %}" 
-           class="inline-block px-6 py-3 rounded-xl bg-gray-800 text-white font-semibold hover:bg-gray-900 transition">
-          Back to Home
-        </a>
-      </div>
-
     </div>
-  </div>
+  </section>
 
-  {% if exception_occurred %}
-    <script>
-      window.onload = function() {
-        alert("City information is not available to Weather API");
+  <!-- ================= 2️⃣ WEATHER DASHBOARD ================= -->
+  <section class="max-w-6xl mx-auto px-6 pb-20 space-y-12">
+
+    <!-- Weather Cards -->
+    <div id="weather-cards" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-white dark:bg-gray-700 rounded-2xl shadow p-6 text-center transition-colors duration-500">
+        <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-300">Temperature</h3>
+        <p class="text-3xl font-bold text-red-500 mt-2" id="temp">{{ temp }}°C</p>
+      </div>
+      <div class="bg-white dark:bg-gray-700 rounded-2xl shadow p-6 text-center transition-colors duration-500">
+        <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-300">Humidity</h3>
+        <p class="text-3xl font-bold text-blue-500 mt-2" id="humidity">{{ humidity }}%</p>
+      </div>
+      <div class="bg-white dark:bg-gray-700 rounded-2xl shadow p-6 text-center transition-colors duration-500">
+        <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-300">Rainfall</h3>
+        <p class="text-3xl font-bold text-indigo-500 mt-2" id="rain">{{ rain }} mm</p>
+      </div>
+      <div class="bg-white dark:bg-gray-700 rounded-2xl shadow p-6 text-center transition-colors duration-500">
+        <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-300">Wind</h3>
+        <p class="text-xl font-semibold text-green-600 mt-2" id="wind">{{ wind }} m/s</p>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="bg-white dark:bg-gray-700 rounded-3xl shadow-lg p-8 border transition-colors duration-500">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Hourly Weather Trend</h2>
+      <canvas id="weatherChart" height="120"></canvas>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  {% include "footer.html" %}
+
+  <script>
+    // Rain animation
+    function updateRain(rainAmount){
+      const container = document.getElementById('rain-container');
+      container.innerHTML = '';
+      if(rainAmount > 0){
+        for(let i=0;i<50;i++){
+          let drop = document.createElement('div');
+          drop.className='rain';
+          drop.style.left=Math.random()*100+'%';
+          drop.style.animationDuration=(Math.random()*1+0.5)+'s';
+          container.appendChild(drop);
+        }
       }
-    </script>
-  {% endif %}
+    }
+
+    // Chart.js
+    const ctx = document.getElementById('weatherChart');
+    let weatherChart = new Chart(ctx,{
+      type:'line',
+      data:{
+        labels: {{ labels|safe }},
+        datasets:[
+          { label:'Temperature (°C)', data: {{ temp_data|safe }}, borderColor:'red', borderWidth:3, tension:0.4, fill:true, backgroundColor:'rgba(255,0,0,0.1)'},
+          { label:'Humidity (%)', data: {{ humidity_data|safe }}, borderColor:'blue', borderWidth:3, tension:0.4, fill:true, backgroundColor:'rgba(0,0,255,0.1)'}
+        ]
+      },
+      options:{ responsive:true, animation:{duration:1000}, plugins:{legend:{position:'bottom'}}, interaction:{mode:'index', intersect:false}, scales:{y:{beginAtZero:true}} }
+    });
+
+    // Fetch Weather
+    function fetchWeather(lat=null, lon=null){
+      let url = `{% url 'weather_dashboard' %}`;
+      if(lat && lon) url += `?lat=${lat}&lon=${lon}`;
+      fetch(url,{ headers:{ 'x-requested-with':'XMLHttpRequest' } })
+        .then(res=>res.json())
+        .then(data=>{
+          document.getElementById('temp').innerText = data.temp+'°C';
+          document.getElementById('humidity').innerText = data.humidity+'%';
+          document.getElementById('rain').innerText = data.rain+' mm';
+          document.getElementById('wind').innerText = data.wind+' m/s';
+
+          weatherChart.data.labels = data.labels;
+          weatherChart.data.datasets[0].data = data.temp_data;
+          weatherChart.data.datasets[1].data = data.humidity_data;
+          weatherChart.update();
+
+          updateRain(data.rain);
+        });
+    }
+
+    // Geolocation
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(pos=>fetchWeather(pos.coords.latitude,pos.coords.longitude),()=>fetchWeather());
+    } else { fetchWeather(); }
+
+    // Auto-refresh every 10 mins
+    setInterval(()=>{ fetchWeather(); },600000);
+  </script>
 
 </body>
 </html>
